@@ -50,17 +50,13 @@ def parse_time(text):
     raise argparse.ArgumentTypeError(f"expected a time like 10:47 PM or 22:47, not {text!r}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--time", type=parse_time, default=datetime.now(),
-                        help='time to say, like "10:47 PM" or 22:47 (default: now)')
-    parser.add_argument("--out", type=Path, default=ROOT / "current_time.wav",
-                        help="file to write (default: current_time.wav)")
-    parser.add_argument("--gap-ms", type=int, default=100,
-                        help="silence between words in milliseconds (default: 100)")
-    args = parser.parse_args()
+def format_time(time):
+    return f"{time:%I:%M %p}".lstrip("0")
 
-    words = time_words(args.time)
+
+def announcement(time, gap_ms=100):
+    """Returns the words, WAV format and audio of the HEV suit saying the time."""
+    words = time_words(time)
     clips = []
     for word in words:
         path = SOUND_DIR / f"{word}.wav"
@@ -75,15 +71,28 @@ def main():
 
     # 8-bit silence is 128, not 0.
     silence = b"\x80" if params.sampwidth == 1 else b"\x00"
-    gap = silence * (params.framerate * args.gap_ms // 1000 * params.nchannels * params.sampwidth)
+    gap = silence * (params.framerate * gap_ms // 1000 * params.nchannels * params.sampwidth)
+    return words, params, gap.join(frames for _, frames in clips)
 
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--time", type=parse_time, default=datetime.now(),
+                        help='time to say, like "10:47 PM" or 22:47 (default: now)')
+    parser.add_argument("--out", type=Path, default=ROOT / "current_time.wav",
+                        help="file to write (default: current_time.wav)")
+    parser.add_argument("--gap-ms", type=int, default=100,
+                        help="silence between words in milliseconds (default: 100)")
+    args = parser.parse_args()
+
+    words, params, frames = announcement(args.time, args.gap_ms)
     with wave.open(str(args.out), "wb") as wav:
         wav.setnchannels(params.nchannels)
         wav.setsampwidth(params.sampwidth)
         wav.setframerate(params.framerate)
-        wav.writeframes(gap.join(frames for _, frames in clips))
+        wav.writeframes(frames)
 
-    print(f"{args.time:%I:%M %p}".lstrip("0") + f": {' '.join(words)}")
+    print(f"{format_time(args.time)}: {' '.join(words)}")
     print(f"Wrote {args.out}")
 
 

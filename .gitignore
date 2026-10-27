@@ -3,3 +3,5 @@ hl1-sounds/
 
 # Generated announcements.
 *.wav
+
+__pycache__/

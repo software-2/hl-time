@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Replaces part of a WAV file with current_time.wav.
+"""Replaces part of a WAV file with the HEV suit saying the current time.
 
 Removes the audio from START to END (in seconds) and puts the announcement
 from say_time.py in its place, converted to match the file.
 
-Usage: python3 insert_time.py file.wav START END [--time-file file.wav] [--out file.wav] [--volume DB]
+Usage: python3 insert_time.py file.wav START END [--out file.wav] [--volume DB]
+       [--time "10:47 PM"] [--gap-ms 100]
 """
 
 import argparse
 import sys
 import wave
+from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+from say_time import announcement, format_time, parse_time
 
 # Fade the audio either side of the cut to avoid clicks.
 FADE_MS = 5
@@ -96,18 +98,18 @@ def main():
     parser.add_argument("file", type=Path, help="WAV file to insert the time into")
     parser.add_argument("start", type=float, help="start of the audio to replace, in seconds")
     parser.add_argument("end", type=float, help="end of the audio to replace, in seconds")
-    parser.add_argument("--time-file", type=Path, default=ROOT / "current_time.wav",
-                        help="announcement to insert (default: current_time.wav)")
     parser.add_argument("--out", type=Path,
                         help="file to write (default: the file's name plus _with_time)")
     parser.add_argument("--volume", type=float, default=0,
                         help="change the announcement's volume, in dB (default: 0)")
+    parser.add_argument("--time", type=parse_time, default=datetime.now(),
+                        help='time to say, like "10:47 PM" or 22:47 (default: now)')
+    parser.add_argument("--gap-ms", type=int, default=100,
+                        help="silence between words in milliseconds (default: 100)")
     args = parser.parse_args()
 
-    if not args.time_file.is_file():
-        sys.exit(f"Missing {args.time_file}. Run say_time.py first.")
     params, frames = read_wav(args.file)
-    time_params, time_frames = read_wav(args.time_file)
+    _, time_params, time_frames = announcement(args.time, args.gap_ms)
 
     duration = params.nframes / params.framerate
     if not 0 <= args.start < args.end <= duration:
@@ -124,17 +126,17 @@ def main():
     after = frames[end:]
     after = fade(after[:fade_size], params, fade_in=True) + after[fade_size:]
 
-    announcement = convert(decode(time_frames, time_params), time_params.framerate, params)
+    time_audio = convert(decode(time_frames, time_params), time_params.framerate, params)
     gain = 10 ** (args.volume / 20)
-    announcement = [[sample * gain for sample in samples] for samples in announcement]
+    time_audio = [[sample * gain for sample in samples] for samples in time_audio]
     out = args.out or args.file.with_name(f"{args.file.stem}_with_time.wav")
     with wave.open(str(out), "wb") as wav:
         wav.setnchannels(params.nchannels)
         wav.setsampwidth(params.sampwidth)
         wav.setframerate(params.framerate)
-        wav.writeframes(before + encode(announcement, params.sampwidth) + after)
+        wav.writeframes(before + encode(time_audio, params.sampwidth) + after)
 
-    print(f"Replaced {args.start:g}s to {args.end:g}s of {args.file.name} with {args.time_file.name}")
+    print(f"Replaced {args.start:g}s to {args.end:g}s of {args.file.name} with {format_time(args.time)}")
     print(f"Wrote {out}")
 
 

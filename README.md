@@ -25,8 +25,8 @@ Works on Windows and Linux. On Windows, use `python` or `py` instead of `python3
    python3 say_time.py
    ```
 
-3. Optionally, put the time into another WAV file. This replaces the audio from 7.8s to 12.69s of
-   `insert/goodevening.wav` with `current_time.wav`, turned down 2.5 dB to match, and writes
+3. Optionally, put the current time into another WAV file. This replaces the audio from 7.8s to
+   12.69s of `insert/goodevening.wav` with the time, turned down 2.5 dB to match, and writes
    `insert/goodevening_with_time.wav`:
 
    ```
