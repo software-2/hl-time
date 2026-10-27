@@ -2,15 +2,25 @@
 
 Makes the Half-Life HEV suit tell you the time: *"The time is now ten oh five p.m."*
 
-You need Windows and your own copy of Half-Life. The game's sounds are not included.
+You need Python 3 and your own copy of Half-Life. The game's sounds are not included.
+Works on Windows and Linux. On Windows, use `python` or `py` instead of `python3`.
 
 ## Usage
 
-1. Run `windows\extract_hl_sounds.bat` to copy the sounds from your Half-Life install into `hl1-sounds\`.
-   If Half-Life isn't in the default Steam folder, pass its location:
+1. Copy the sounds from your Half-Life install into `hl1-sounds/`:
 
    ```
-   windows\extract_hl_sounds.bat "D:\SteamLibrary\steamapps\common\Half-Life"
+   python3 extract_hl_sounds.py
    ```
 
-2. Run `windows\say_time.bat`. It writes the current time to `current_time.wav`.
+   If Half-Life isn't in a default Steam folder, pass its location:
+
+   ```
+   python3 extract_hl_sounds.py "D:/SteamLibrary/steamapps/common/Half-Life"
+   ```
+
+2. Write the current time to `current_time.wav`:
+
+   ```
+   python3 say_time.py
+   ```
