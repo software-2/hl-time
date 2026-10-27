@@ -10,7 +10,7 @@ set "HL_DIR=%~1"
 if not defined HL_DIR set "HL_DIR=%ProgramFiles(x86)%\Steam\steamapps\common\Half-Life"
 
 set "SRC=%HL_DIR%\valve\sound\fvox"
-set "DEST=%~dp0hl1-sounds"
+for %%I in ("%~dp0..") do set "DEST=%%~fI\hl1-sounds"
 
 set "FILES=bell time_is_now am pm hours minutes _comma _period"
 set "FILES=%FILES% one two three four five six seven eight nine ten"

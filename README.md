@@ -6,11 +6,11 @@ You need Windows and your own copy of Half-Life. The game's sounds are not inclu
 
 ## Usage
 
-1. Run `extract_hl_sounds.bat` to copy the sounds from your Half-Life install into `hl1-sounds\`.
+1. Run `windows\extract_hl_sounds.bat` to copy the sounds from your Half-Life install into `hl1-sounds\`.
    If Half-Life isn't in the default Steam folder, pass its location:
 
    ```
-   extract_hl_sounds.bat "D:\SteamLibrary\steamapps\common\Half-Life"
+   windows\extract_hl_sounds.bat "D:\SteamLibrary\steamapps\common\Half-Life"
    ```
 
-2. Run `say_time.bat`. It writes the current time to `current_time.wav`.
+2. Run `windows\say_time.bat`. It writes the current time to `current_time.wav`.

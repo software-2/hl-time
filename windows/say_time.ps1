@@ -4,13 +4,13 @@
 # Usage: .\say_time.ps1 [-Time "10:47 PM"] [-OutFile file.wav] [-GapMs 100]
 param(
     [datetime]$Time = (Get-Date),
-    [string]$OutFile = (Join-Path $PSScriptRoot 'current_time.wav'),
+    [string]$OutFile = (Join-Path (Split-Path $PSScriptRoot) 'current_time.wav'),
     [int]$GapMs = 100
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'wav_tools.ps1')
-$soundDir = Join-Path $PSScriptRoot 'hl1-sounds'
+$soundDir = Join-Path (Split-Path $PSScriptRoot) 'hl1-sounds'
 
 $ones = @($null, 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
     'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen')
