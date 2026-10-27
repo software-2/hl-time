@@ -24,3 +24,10 @@ Works on Windows and Linux. On Windows, use `python` or `py` instead of `python3
    ```
    python3 say_time.py
    ```
+
+3. Optionally, put the time into another WAV file. This replaces the audio from 7.8s to 12.69s of
+   `insert/goodevening.wav` with `current_time.wav`, and writes `insert/goodevening_with_time.wav`:
+
+   ```
+   python3 insert_time.py insert/goodevening.wav 7.8 12.69
+   ```
