@@ -4,7 +4,7 @@
 Removes the audio from START to END (in seconds) and puts the announcement
 from say_time.py in its place, converted to match the file.
 
-Usage: python3 insert_time.py file.wav START END [--time-file file.wav] [--out file.wav]
+Usage: python3 insert_time.py file.wav START END [--time-file file.wav] [--out file.wav] [--volume DB]
 """
 
 import argparse
@@ -100,6 +100,8 @@ def main():
                         help="announcement to insert (default: current_time.wav)")
     parser.add_argument("--out", type=Path,
                         help="file to write (default: the file's name plus _with_time)")
+    parser.add_argument("--volume", type=float, default=0,
+                        help="change the announcement's volume, in dB (default: 0)")
     args = parser.parse_args()
 
     if not args.time_file.is_file():
@@ -123,6 +125,8 @@ def main():
     after = fade(after[:fade_size], params, fade_in=True) + after[fade_size:]
 
     announcement = convert(decode(time_frames, time_params), time_params.framerate, params)
+    gain = 10 ** (args.volume / 20)
+    announcement = [[sample * gain for sample in samples] for samples in announcement]
     out = args.out or args.file.with_name(f"{args.file.stem}_with_time.wav")
     with wave.open(str(out), "wb") as wav:
         wav.setnchannels(params.nchannels)
