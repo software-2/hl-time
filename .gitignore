@@ -1,0 +1,5 @@
+# Half-Life's sounds belong to Valve; each user extracts their own.
+hl1-sounds/
+
+# Generated announcements.
+*.wav
